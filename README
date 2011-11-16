@@ -1,0 +1,41 @@
+One of the first obstacles you'll encounter when trying to use HTML5 Canvas for interactive graphics experiments is that mouse button and drag tracking is badly broken. First, there isn't uniformity across browsers even for the numbering of the mouse buttons. Second, once the mouse leaves the canvas element itself, you get no more mouse events, so you won't even hear about a mouseup event that ends a drag if it happens outside the canvas.
+
+In a conventional UI toolkit like Swing or Qt, neither problem is present. A widget that gets the mouse press event, will "grab" the mouse and will be fed mouse move and mouse release events even when the mouse is no longer over the widget. That's very convenient, but isn't how the DOM works. There is no concept of mouse grabbing in the HTML/Js world. Second, and most important, in a conventional GUI framework every mouse event including mouse move comes packaged with the current (or spawning) button and keyboard modifier information on the event itself. That means that if you want to know which buttons are pressed during a mouse move event, you can just ask. Not so in HTML/Js. A mouse move event has very little button/modifier information, and what little it has is browser-specific. You are reduced to doing a bunch of manual button tracking to retain and update state.
+
+I've been on the hunt for cross-browser workarounds, and I've patched together a solution that seems to work well enough from a few sources.
+
+My requirements are that I be able to track a left-button drag that begins in the canvas and then leaves and re-enters. I don't require that I get mouse move events while the mouse is outside the canvas, but I do need to know if the mouse is released outside the canvas. If it's released outside the canvas, I don't want to continue the drag when the mouse re-enters the canvas with no buttons pressed.
+
+I do not want to consider mouse moves that begin with a press outside the canvas as drags.
+
+Middle and right button tracking are nice-to-have, but I'm not concentrating on them at the moment. However, I do require that the left button tracking not get confused by patterns of press/release of the other buttons that may come at any time relative to the left press/release. My original, simplest solution was easily fooled in Safari by this pattern: left press, right press, left release, right release. It got stuck in drag mode, and had to be reset by another left click.
+
+The Canvas element is no different from any other DOM element with respect to mouse events and tracking, so any solution that works for Canvas will work for anything in the page. These issues are generally less urgent for other elements because we don't expect them to be the basis for interactive graphics applications. The other piece of good news is that since this is focused on the Canvas element, we don't need to consider versions of Internet Explorer earlier than IE9 (the first with canvas support). That matters because IE9 behaves differently when you use the standard "addEventListener" as opposed to the old non-standard IE "attachEvent." If you're using jQuery to attach the event listeners, it's likely to obscure this difference, and you won't get useful results from this technique because the "event.which" field isn't present.
+
+The most thorough treatment I found of the cross-browser differences in the event.button and event.which fields is from <a href="http://unixpapa.com/js/mouse.html">Javascript Madness by Jan Wolter</a>. It's really excellent. He has a test page that demonstrates the usage of these fields for a <a href="http://unixpapa.com/js/testmouse-2.html">link element</a>.
+
+The problem of not hearing mouse releases off the canvas can be solved simply by placing a mouseup listener on the root document. Apparently it hears about mouse releases even when the mouse is not over the browser application at all. That's good because without some mechanism for capturing activity outside the browser window, the whole endeavor would be shot.
+
+Context menu hell:
+Safari and Chrome: It appears that the context menu wreaks havoc with button tracking. I have not yet been able to figure out how to get correct left mouse drag tracking in the presence of default context menu handling. The killer case is left press, right press (the context menu comes up), left release (the context menu disappears, but we do not get a mouseup event anywhere), right release. The left-button drag flag is stuck on. If we block context menu processing on the canvas with "event.preventDefault()," it works. Since the context menu isn't that useful for interactive graphics, I'm going to block it by default in the drag tracker. You can turn it back on, but do so at your own peril: it can lead to stuck drags.
+
+The context menu is actually worse than all that. Even if we disable it on the canvas, bringing it up anywhere else on the page has the same disastrous effect. The drag can get stuck on. You can verify that the events are not being delivered in the event log on the test page provided. If anybody knows a solution to this problem, please let me know.
+
+Firefox: Firefox on Mac appears to treat the context menu and its dismissal differently. It is not possible to get stuck in drag on Firefox even with the context menu in use. (Actually, I have been able to get it to stick by using the context menu to navigate away from the page with the context menu (with the left button down originally) and then navigating back. Yuck! Again, if this can be prevented, please let me know.)
+
+Usage:
+The usage is pretty straightforward. When the document loads, create a drag tracker for the element you want to track:
+
+var dragTracker = create_drag_tracker("myCanvas");
+
+Then the API of the dragTracker returned is
+
+dragTracker.isDragging( buttonNumber );
+dragTracker.isDraggingLeftButton();
+dragTracker.setDragStateChangedFunction( func ); // Func is a callback function taking a dragTracker and button number
+dragTracker.contextMenuEnabled = false;
+
+You can see it in action at <a href="http://upfork.com/articles/2011/11/javascript-fluid-simulation-for-html5-canvas/">UpFork!</a>
+
+TODO:
+Try this out and get it working on IE9 and earlier.

@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <style>
+  body {
+    margin: 0px;
+    padding: 0px;
+  }
+  #myCanvas {
+    border: 1px solid #989898;
+  }
+  </style>
+  <script src="mouseDragTracker.js"></script>
+  <script src="logEvents.js"></script>
+  <script>
+  
+  window.onload = function() {
+    var dragTracker = create_drag_tracker("myCanvas");
+    var canvas = document.getElementById("myCanvas");
+    
+    var onDragStateChanged = function ( tracker, button )
+    {
+      var context = canvas.getContext("2d");
+      var lineHeight = 24;
+      var numButtons = 3;
+      
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.font = "16px sans-serif";
+      for (var i = 1; i <= numButtons; i++)
+      {
+        context.fillText("Is dragging button " + i + ": " + tracker.isDragging(i),  40, canvas.height / 2 + (i+1 - numButtons) * lineHeight);
+      }
+    }
+    
+    dragTracker.setDragStateChangedFunction(onDragStateChanged);
+    // dragTracker.contextMenuEnabled = true; // Not recommended. Can lead to stuck drags.
+    onDragStateChanged( dragTracker, 0);
+    
+    // For debugging purposes only:
+    log_events("myCanvas", "eventlogform");
+  };
+  
+  </script>
+  </head>
+  <body onmousedown="return false;">
+    <canvas id="myCanvas" width="300" height="150"></canvas>
+    <p>Event log: (code adapted from <a href="http://unixpapa.com/js/testmouse-2.html">Jan Wolter</a>)<br/>
+    <a href="#"  class="page" onClick="document.forms['eventlogform'].elements[0].value =''; return false">Clear event log</a></p>
+    <form name="eventlogform">
+    <textarea rows=15 cols=65></textarea></p>
+    </form>
+  </body>
+  </html>
