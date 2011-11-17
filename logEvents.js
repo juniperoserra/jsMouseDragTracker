@@ -30,7 +30,7 @@
  
 function log_events(trackedElementName, formName) {
   var area = document.forms[formName].elements[0];
-  var maxlines= 15;
+  var maxlines= 10;
   var element = document.getElementById(trackedElementName);
   
   function countLines()
@@ -55,7 +55,7 @@ function log_events(trackedElementName, formName) {
 
   function logIt(evt,e)
   {
-      showmesg(evt+" which="+e.which+" button="+e.button+' buttons='+e.buttons);
+      showmesg(evt+" which="+e.which+" button="+e.button);
   }
   
   element.addEventListener("mousedown", function(event)    {return logIt('element mousedown    ',event);}, false );

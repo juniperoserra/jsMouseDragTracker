@@ -35,7 +35,7 @@ dragTracker.isDraggingLeftButton();
 dragTracker.setDragStateChangedFunction( func ); // Func is a callback function taking a dragTracker and button number
 dragTracker.contextMenuEnabled = false;
 
-You can see it in action at <a href="http://upfork.com/articles/2011/11/javascript-fluid-simulation-for-html5-canvas/">UpFork!</a>
+You can see it in action at <a href="http://upfork.com/articles/2011/11/mouse-button-drag-tracking-in-javascript/">UpFork!</a>
 
 TODO:
 Try this out and get it working on IE9 and earlier.
