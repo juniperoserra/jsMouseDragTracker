@@ -12,7 +12,7 @@ Middle and right button tracking are nice-to-have, but I'm not concentrating on 
 
 The Canvas element is no different from any other DOM element with respect to mouse events and tracking, so any solution that works for Canvas will work for anything in the page. These issues are generally less urgent for other elements because we don't expect them to be the basis for interactive graphics applications. The other piece of good news is that since this is focused on the Canvas element, we don't need to consider versions of Internet Explorer earlier than IE9 (the first with canvas support). That matters because IE9 behaves differently when you use the standard "addEventListener" as opposed to the old non-standard IE "attachEvent." If you're using jQuery to attach the event listeners, it's likely to obscure this difference, and you won't get useful results from this technique because the "event.which" field isn't present.
 
-The most thorough treatment I found of the cross-browser differences in the event.button and event.which fields is from <a href="http://unixpapa.com/js/mouse.html">Javascript Madness by Jan Wolter</a>. It's really excellent. He has a test page that demonstrates the usage of these fields for a <a href="http://unixpapa.com/js/testmouse-2.html">link element</a>.
+The most thorough treatment I found of the cross-browser differences in the event.button and event.which fields is from Javascript Madness by Jan Wolter [ http://unixpapa.com/js/mouse.html ]. It's really excellent. He has a test page that demonstrates the usage of these fields for a link element [ http://unixpapa.com/js/testmouse-2.html ].
 
 The problem of not hearing mouse releases off the canvas can be solved simply by placing a mouseup listener on the root document. Apparently it hears about mouse releases even when the mouse is not over the browser application at all. That's good because without some mechanism for capturing activity outside the browser window, the whole endeavor would be shot.
 
@@ -35,7 +35,6 @@ dragTracker.isDraggingLeftButton();
 dragTracker.setDragStateChangedFunction( func ); // Func is a callback function taking a dragTracker and button number
 dragTracker.contextMenuEnabled = false;
 
-You can see it in action at <a href="http://upfork.com/articles/2011/11/mouse-button-drag-tracking-in-javascript/">UpFork!</a>
+You can see it in action at UpFork! [ http://upfork.com/articles/2011/11/mouse-button-drag-tracking-in-javascript/ ]
 
-TODO:
-Try this out and get it working on IE9 and earlier.
+It turns out this works in IE9. I have yet to try it in IE8 and earlier.
